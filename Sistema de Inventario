@@ -6,10 +6,5 @@ API REST Java, utilizando Spring Boot
 e ReactJs para front end
 ''
 ################
-//RASCUNHO//
-
-A aplicação Java não vai gerar HTML, vai expor dados 
-(Em gormato JSON, geralmente), através de endpoints. 
-O frontEnd vai fazer requisições a esses endpoints.
 
 
