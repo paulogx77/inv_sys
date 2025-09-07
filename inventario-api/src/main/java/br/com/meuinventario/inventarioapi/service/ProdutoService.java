@@ -3,7 +3,11 @@ package br.com.meuinventario.inventarioapi.service;
 import br.com.meuinventario.inventarioapi.exception.ResourceNotFoundException;
 import br.com.meuinventario.inventarioapi.model.Produto;
 import br.com.meuinventario.inventarioapi.repository.ProdutoRepository;
+import br.com.meuinventario.inventarioapi.dto.CriacaoProdutoResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,8 +18,16 @@ public class ProdutoService {
     @Autowired // 2. O Serviço agora depende do Repositório
     private ProdutoRepository produtoRepository;
 
-    public List<Produto> listarTodos() {
-        return produtoRepository.findAll();
+    public Page<Produto> listarTodos(String termoBusca, Pageable pageable) {
+        System.out.println("--- SERVICE ---");
+
+        if (termoBusca != null && !termoBusca.isEmpty()) {
+            System.out.println("Executando busca por: " + termoBusca);
+            return produtoRepository.findByNomeContainingIgnoreCase(termoBusca, pageable);
+        } else {
+            System.out.println("Executando findAll paginado.");
+            return produtoRepository.findAll(pageable);
+        }
     }
 
     public Produto buscarPorId(Long id) {
@@ -23,9 +35,10 @@ public class ProdutoService {
                 .orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado com o ID: " + id));
     }
 
-    public Produto criar(Produto produto) {
-        // Aqui poderíamos adicionar lógicas de negócio, como validar se o SKU já existe.
-        return produtoRepository.save(produto);
+    public CriacaoProdutoResponse criar(Produto produto) {
+        Produto produtoSalvo = produtoRepository.save(produto);
+        long totalElementos = produtoRepository.count();
+        return new CriacaoProdutoResponse(produtoSalvo, totalElementos);
     }
 
     public Produto atualizar(Long id, Produto produtoAtualizado) {

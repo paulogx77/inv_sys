@@ -1,13 +1,16 @@
 package br.com.meuinventario.inventarioapi.controller;
 
+import br.com.meuinventario.inventarioapi.dto.CriacaoProdutoResponse;
 import br.com.meuinventario.inventarioapi.model.Produto;
 import br.com.meuinventario.inventarioapi.service.ProdutoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 
 @RestController
@@ -18,14 +21,21 @@ public class ProdutoController {
     private ProdutoService produtoService;
 
     @PostMapping
-    public ResponseEntity<Produto> criar(@Valid @RequestBody Produto produto) {
-        Produto produtoSalvo = produtoService.criar(produto);
-        return new ResponseEntity<>(produtoSalvo, HttpStatus.CREATED);
+    public ResponseEntity<CriacaoProdutoResponse> criar(@Valid @RequestBody Produto produto) {
+       CriacaoProdutoResponse response = produtoService.criar(produto);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public List<Produto> listarTodos() {
-        return produtoService.listarTodos();
+    public Page<Produto> listarTodos(
+            @RequestParam(value = "search", required = false) String termoBusca,
+            Pageable pageable) {
+
+        System.out.println("--- CONTROLLER ---");
+        System.out.println("Termo de Busca Recebido: " + termoBusca);
+        System.out.println("Pageable Recebido: " + pageable);
+
+        return produtoService.listarTodos(termoBusca, pageable);
     }
 
     @GetMapping("/{id}")

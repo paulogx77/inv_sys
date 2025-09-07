@@ -1,16 +1,15 @@
 import { useState, useEffect } from 'react';
+import { TextField, Button, Box, Typography, Stack } from '@mui/material';
 
-// Agora o formulário recebe o produto para editar e uma função para cancelar
-function ProductForm({ onProdutoAdicionado, produtoParaEditar, onProdutoAtualizado, onCancelarEdicao, isLoading }) {
+
+function ProductForm({ onProdutoAdicionado, produtoParaEditar, onProdutoAtualizado, onCancelarEdicao, isLoading, onSuccess }) {
   const [nome, setNome] = useState('');
   const [sku, setSku] = useState('');
   const [quantidade, setQuantidade] = useState(0);
   const [preco, setPreco] = useState(0.0);
 
-  // Determina se estamos em modo de edição
   const isEditing = produtoParaEditar !== null;
 
-  // useEffect é perfeito para sincronizar o estado do formulário com as props
   useEffect(() => {
     if (isEditing) {
       setNome(produtoParaEditar.nome);
@@ -26,54 +25,104 @@ function ProductForm({ onProdutoAdicionado, produtoParaEditar, onProdutoAtualiza
     }
   }, [produtoParaEditar, isEditing]); // Este efeito roda sempre que 'produtoParaEditar' muda
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  const handleSubmit = async (event) => {
+  event.preventDefault();
 
-    const dadosProduto = {
-      nome,
-      sku,
-      quantidade: parseInt(quantidade, 10),
-      preco: parseFloat(preco)
-    };
-
-    if (isEditing) {
-      // Se estiver editando, chama a função de atualização
-      onProdutoAtualizado(produtoParaEditar.id, dadosProduto);
-    } else {
-      // Se estiver criando, chama a função de adição
-      fetch('http://localhost:8080/api/produtos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(dadosProduto),
-      })
-      .then(response => response.json())
-      .then(produtoSalvo => {
-        onProdutoAdicionado(produtoSalvo);
-        setNome(''); setSku(''); setQuantidade(0); setPreco(0.0);
-      })
-      .catch(error => console.error('Erro ao criar produto:', error));
-    }
+  const dadosProduto = {
+    nome,
+    sku,
+    quantidade: parseInt(quantidade, 10),
+    preco: parseFloat(preco)
   };
 
+
+  let success = false;
+
+  if (isEditing) {
+    success = await onProdutoAtualizado(produtoParaEditar.id, dadosProduto);
+  } else {
+
+    success = await onProdutoAdicionado(dadosProduto);
+  }
+
+  if (success) {
+    if (!isEditing) {
+      setNome(''); setSku(''); setQuantidade(0); setPreco(0.0);
+    }
+    onSuccess();
+  }
+};
+
+
+
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>{isEditing ? 'Editar Produto' : 'Adicionar Novo Produto'}</h2>
-      {/* ... campos do formulário*/}
-      <div><label>Nome:</label><input type="text" value={nome} onChange={e => setNome(e.target.value)} required /></div>
-      <div><label>SKU:</label><input type="text" value={sku} onChange={e => setSku(e.target.value)} required /></div>
-      <div><label>Quantidade:</label><input type="number" value={quantidade} onChange={e => setQuantidade(e.target.value)} required /></div>
-      <div><label>Preço:</label><input type="number" step="0.01" value={preco} onChange={e => setPreco(e.target.value)} required /></div>
+    // 2. Usamos Box em vez de form, o onSubmit vai nele
+    <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+      <Typography component="h1" variant="h5">
+        {isEditing ? 'Editar Produto' : 'Adicionar Novo Produto'}
+      </Typography>
       
-      <button type="submit" disabled={isLoading}>
-        {isLoading ? 'Salvando...' : (isEditing ? 'Salvar Alterações' : 'Adicionar Produto')}
-      </button>
-      
-      {isEditing && (
-        <button type="button" onClick={onCancelarEdicao} disabled={isLoading}>
-          Cancelar
-        </button>
-      )}
-    </form>
+      {/* 3. Stack organiza os itens em uma coluna com espaçamento */}
+      <Stack spacing={2} sx={{ mt: 2 }}>
+        <TextField
+          label="Nome do Produto"
+          variant="outlined"
+          fullWidth
+          required
+          value={nome}
+          onChange={e => setNome(e.target.value)}
+        />
+        <TextField
+          label="SKU"
+          variant="outlined"
+          fullWidth
+          required
+          value={sku}
+          onChange={e => setSku(e.target.value)}
+        />
+        <TextField
+          label="Quantidade"
+          type="number"
+          variant="outlined"
+          fullWidth
+          required
+          value={quantidade}
+          onChange={e => setQuantidade(e.target.value)}
+        />
+        <TextField
+          label="Preço"
+          type="number"
+          variant="outlined"
+          fullWidth
+          required
+          value={preco}
+          onChange={e => setPreco(e.target.value)}
+          inputProps={{ step: "0.01" }}
+        />
+        
+        {/* 4. Botões da MUI */}
+        <Box>
+          <Button
+            type="submit"
+            variant="contained" // Botão principal
+            disabled={isLoading}
+            sx={{ mr: 1 }} // Margem à direita
+          >
+            {isLoading ? 'Salvando...' : (isEditing ? 'Salvar Alterações' : 'Adicionar Produto')}
+          </Button>
+
+          {isEditing && (
+            <Button 
+              variant="outlined" // Botão secundário
+              onClick={onCancelarEdicao} 
+              disabled={isLoading}
+            >
+              Cancelar
+            </Button>
+          )}
+        </Box>
+      </Stack>
+    </Box>
   );
 }
 
