@@ -52,24 +52,87 @@ Este é um projeto de um Sistema de Inventário completo, construído com uma ar
 
 ---
 
-## ⚙️ Como Executar o Projeto
+## ⚙️ Como Executar o Projeto com Docker (Recomendado)
+
+A maneira mais fácil e recomendada de executar este projeto é usando Docker e Docker Compose. Isso garante que todo o ambiente (banco de dados, backend e frontend) seja configurado de forma consistente e automática.
 
 ### Pré-requisitos
-- **Java JDK 17** ou superior.
-- **Node.js 20.x** ou superior (com npm).
-- **Maven**
-- Uma instância de **PostgreSQL** rodando (localmente ou na nuvem como o NeonDB).
-- Uma IDE para Java (ex: IntelliJ IDEA, VS Code) e um editor de código para o frontend (ex: VS Code).
+- **Docker** e **Docker Compose** instalados na sua máquina.
 
-### 1. Backend
+### Executando a Aplicação
+1.  **Clone o repositório:**
+    ```bash
+    git clone [URL_DO_SEU_REPOSITORIO]
+    cd [NOME_DA_PASTA_DO_PROJETO]
+    ```
+
+2.  **Suba toda a stack com um único comando:**
+    Na pasta raiz do projeto (onde o arquivo `docker-compose.yml` está localizado), execute:
+    ```bash
+    docker compose up --build
+    ```
+    *   O comando `--build` é importante na primeira vez para construir as imagens customizadas para o backend e o frontend.
+    *   Este comando irá:
+        1.  Baixar a imagem do PostgreSQL.
+        2.  Construir a imagem da API Spring Boot.
+        3.  Construir a imagem da aplicação React.
+        4.  Iniciar os três contêineres e conectá-los em uma rede.
+
+3.  **Acesse as aplicações:**
+    *   **Frontend (UI):** [http://localhost:5173](http://localhost:5173)
+    *   **Backend (API):** [http://localhost:8080](http://localhost:8080)
+
+Para parar toda a aplicação, pressione `Ctrl+C` no terminal onde o compose está rodando e depois execute:
 ```bash
-# Navegue para a pasta do backend (ex: inventario-api)
-cd inventario-api
+docker compose down
+```
 
-# Configure o banco de dados
-# Abra o arquivo `src/main/resources/application.properties` e
-# atualize as propriedades `spring.datasource.url`, `username` e `password`
-# com as credenciais do seu banco de dados PostgreSQL.
+## 🔧 Como Executar o Projeto Manualmente (Desenvolvimento Local)
 
-# Instale as dependências e execute a aplicação
-./mvnw spring-boot:run
+Se preferir rodar cada parte do projeto isoladamente sem o Docker Compose, siga os passos abaixo.
+
+### Pré-requisitos
+- **Java JDK 21** e **Maven 4.0.0** (ou superior) instalados.
+- **Node.js 20.x** (ou superior) instalado.
+- Uma instância de **PostgreSQL** rodando e acessível.
+
+### 1. Backend (API)
+
+Primeiro, inicie o servidor da API.
+
+1.  **Navegue para a pasta do backend:**
+    ```bash
+    cd inventario-api
+    ```
+
+2.  **Configure a conexão com o banco de dados:**
+    Abra o arquivo `src/main/resources/application.properties` e atualize as seguintes propriedades com as credenciais do seu banco de dados:
+    ```properties
+    spring.datasource.url=jdbc:postgresql://SEU_HOST:5432/SEU_BANCO
+    spring.datasource.username=SEU_USUARIO
+    spring.datasource.password=SUA_SENHA
+    ```
+
+3.  **Execute a aplicação:**
+    ```bash
+    ./mvnw spring-boot:run
+    ```
+    A API estará disponível em `http://localhost:8080`.
+
+### 2. Frontend (UI)
+
+Com o backend rodando, inicie a interface do usuário.
+
+1.  **Em um novo terminal, navegue para a pasta do frontend:**
+    ```bash
+    cd inv-frontend
+    ```
+2.  **Instale as dependências do projeto:**
+    ```bash
+    npm install
+    ```
+3.  **Execute o servidor de desenvolvimento:**
+    ```bash
+    npm run dev
+    ```
+    A aplicação estará acessível no seu navegador em `http://localhost:5173` (ou na porta indicada pelo Vite).
