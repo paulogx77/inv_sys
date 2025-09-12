@@ -25,8 +25,7 @@ public class Usuario implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Para simplificar, não usaremos roles (ex: ROLE_ADMIN, ROLE_USER) por enquanto.
-        // Retornamos uma lista vazia.
+        // Por enquanto retornamos uma lista vazia.
         return Collections.emptyList();
     }
 
