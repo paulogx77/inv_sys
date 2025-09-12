@@ -35,12 +35,12 @@ Este é um projeto de um Sistema de Inventário completo, construído com uma ar
 ## 🛠️ Tecnologias Utilizadas
 
 ### Backend
-- **Java 17**
+- **Java 21**
 - **Spring Boot 3.x**
 - **Spring Security:** Para autenticação e autorização.
 - **Spring Data JPA (Hibernate):** Para acesso a dados.
 - **PostgreSQL:** Banco de dados relacional.
-- **Maven:** Gerenciador de dependências.
+- **Maven: 4.0** Gerenciador de dependências.
 - **JWT (Java JWT):** Para geração e validação de tokens.
 
 ### Frontend
@@ -62,8 +62,8 @@ A maneira mais fácil e recomendada de executar este projeto é usando Docker e 
 ### Executando a Aplicação
 1.  **Clone o repositório:**
     ```bash
-    git clone [URL_DO_SEU_REPOSITORIO]
-    cd [NOME_DA_PASTA_DO_PROJETO]
+    git clone https://github.com/paulogx77/inv_sys.git
+    cd inv_sys
     ```
 
 2.  **Suba toda a stack com um único comando:**
