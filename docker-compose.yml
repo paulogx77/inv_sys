@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  # Serviço do Banco de Dados PostgreSQL
+  postgres-db:
+    image: postgres:latest
+    container_name: postgres-db-compose
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: inventario_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  # Serviço do Backend (API Spring Boot)
+  inventario-api:
+    build: ./inventario-api
+    container_name: inventario-api-compose
+    ports:
+      - "8080:8080"
+    environment:
+      # A API precisa saber como encontrar o banco de dados.
+      # Usamos o nome do serviço 'postgres-db' como hostname. Docker Compose cuida da resolução de rede.
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/inventario_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: mysecretpassword
+    depends_on:
+      - postgres-db # Garante que o contêiner do banco de dados inicie antes da API
+
+  # Serviço do Frontend (React UI)
+  inventario-frontend:
+    build: ./inventario-frontend
+    container_name: inventario-frontend-compose
+    ports:
+      - "5173:80" # Mapeia a porta 5173 da sua máquina para a porta 80 do Nginx no contêiner
+    depends_on:
+      - inventario-api # Opcional, mas bom para garantir que a API esteja pronta
+
+volumes:
+  postgres-data: # Define um volume nomeado para persistir os dados do PostgreSQL
