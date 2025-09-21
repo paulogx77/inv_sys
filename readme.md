@@ -1,4 +1,5 @@
-#  Sistema de Inventário Full-Stack
+#  Sistema de Inventário Full-Stack 
+#(Em Desenvolvimento)
 
 ![Java](https://img.shields.io/badge/Java-17-blue)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.x-green)
